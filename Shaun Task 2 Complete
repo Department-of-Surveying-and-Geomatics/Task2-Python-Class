@@ -1,0 +1,83 @@
+"""
+The following code reads X and Y coordinates from either a CSV or text file,
+plots the original coordinates on a scatterplot, translates the points
+by a fixed offset, and then plots the translated coordinates on the
+same scatterplot. The script supports both CSV and text file formats since we use both. 
+
+"""
+import matplotlib.pyplot as plt
+import csv
+
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def translate(self, dx, dy):
+        self.x += dx
+        self.y += dy
+
+    def __str__(self):
+        return f"({self.x}, {self.y})"
+
+def main():
+    file_name = input("Enter the name of the file with X and Y coordinates: ") #prompt user to input file
+
+    # Determine the file type based on the extension
+    if file_name.endswith(".csv"):
+        points = read_csv_file(file_name)
+    elif file_name.endswith(".txt"):
+        points = read_text_file(file_name)
+    else:
+        print("Unsupported file format. Please provide a .csv or .txt file.")
+        return
+
+    # Plot the coordinates on a scatterplot
+    original_x_coords = [p.x for p in points]
+    original_y_coords = [p.y for p in points]
+    plt.scatter(original_x_coords, original_y_coords, color="black", label="Original Coordinates")
+
+    # Translate the points
+    dx = 5
+    dy = 2
+    for point in points:
+        point.translate(dx, dy)
+
+    # Replot the translated points in a different color
+    translated_x_coords = [p.x for p in points]
+    translated_y_coords = [p.y for p in points]
+    plt.scatter(translated_x_coords, translated_y_coords, color="green", label="Translated Coordinates")
+
+    # Add a legend and show the plot
+    plt.title("Original and Translated Coordinates")
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.legend()
+    plt.show()
+
+def read_csv_file(file_name):
+    points = []
+    with open(file_name, "r") as file:
+        csv_reader = csv.reader(file)
+        next(csv_reader)  # Skip the header row
+        for row in csv_reader:
+            x = float(row[0])
+            y = float(row[1])
+            points.append(Point(x, y))
+        return points
+
+def read_text_file(file_name):
+    points = []
+    with open(file_name, "r") as file:
+        # Read the first line
+        first_line = file.readline().strip()
+        
+        # Map the subsequent lines
+        for line in file:
+            x, y = map(float, line.strip().split(","))
+            points.append(Point(x, y))
+           
+    return points
+
+if __name__ == "__main__":
+    main()
